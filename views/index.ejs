@@ -1,0 +1,169 @@
+<!-- show Hello word be user -->
+
+
+<!-- filepath: /home/kalimoha/Desktop/Desktop/owasp/project-network/master/views/index.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Project</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --dark-bg: #0a0a0a;
+            --dark-surface: #1a1a1a;
+            --dark-text: #e0e0e0;
+            --accent-color: #4a90e2;
+            --accent-hover: #357abd;
+            --border-dark: rgba(255,255,255,0.1);
+        }
+
+        body {
+            background: var(--dark-bg);     
+            color: var(--dark-text);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .navbar {
+            background: rgba(10, 10, 10, 0.95) !important;
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .nav-link {
+            color: var(--dark-text) !important;
+            transition: all 0.2s ease;
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            border-radius: 6px;
+        }
+
+        .nav-link:hover {
+            background: rgba(74, 144, 226, 0.1);
+            color: var(--accent-color) !important;
+        }
+
+        .auth-container {
+            background: var(--dark-surface);
+            border-radius: 12px;
+            border: 1px solid var(--border-dark);
+            padding: 2rem;
+            max-width: 400px;
+            margin: 2rem auto;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .welcome-section {
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+
+        .feature-card {
+            background: var(--dark-surface);
+            border: 1px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: transform 0.2s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        footer {
+            background: var(--dark-surface);
+            padding: 1.5rem 0;
+            margin-top: 4rem;
+            text-align: center;
+            border-top: 1px solid var(--border-dark);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Network Project</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/login">Login</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/auth/register">Register</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <section class="welcome-section">
+            <h1>Welcome to Network Project</h1>
+            <p class="lead text-muted"></p>
+        </section>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <div class="features-grid">
+            <div class="feature-card">
+                <h3>Secure Authentication</h3>
+                <p>Protected login and registration system with rate limiting</p>
+            </div>
+            <div class="feature-card">
+                <h3>User Profiles</h3>
+                <p>Customize your profile with images and personal information</p>
+            </div>
+            <div class="feature-card">
+                <h3>Password Recovery</h3>
+                <p>Secure password reset functionality when needed</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p class="mb-0">&copy; 2025 Network Project. created by @moha_st.</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
