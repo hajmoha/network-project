@@ -1,3 +1,3 @@
 # network-project
 
-![](https://github.com/hajmoha/network-project/issues/1)
+![example](https://github.com/hajmoha/network-project/issues/1)
