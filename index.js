@@ -10,7 +10,7 @@ const homeRoutes = require('./routes/home.route');
 const sequelize = require('./database/connection');
 const { isAdmin, authMiddleware } = require('./middleware/auth.middleware');
 const cookieParser = require('cookie-parser');
-
+const adminExists = require('./routes/routes/createDefaultAdmin');
 
 // created instance of express
 const app = express();
@@ -33,21 +33,25 @@ app.use(bodyParser.json());
 
 // set the path for static files
 app.use(express.static(path.join(__dirname, 'static')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(path.join(__dirname, 'static/uploads')));
+
 
 // routers
-app.use('/', homeRoutes);  // fix: use homeRoutes for the home path
+app.use('/', homeRoutes);  
 app.use('/auth', authRoutes);  
 app.use('/user', authMiddleware, userRoutes);
 app.use('/admin', authMiddleware, isAdmin, adminRoutes);
 
+
+
 app.listen(port, async () => {
     try {
         await sequelize.authenticate();
+        await adminExists();
         await sequelize.sync({
-            force: false // Optional, use with caution as it drops tables on every restart
+            force: false // true will drop the table if it already existss
         });
-
+        
         console.log('Connection has been established successfully.');
         console.log(`Example app listening on port ${port}`);
     } catch (error) {

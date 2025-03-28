@@ -12,14 +12,20 @@ const rateLimit = require('express-rate-limit');
 const loginLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
     max: 5, // limit each IP to 5 requests per windowMs
-    message: "Too many login attempts, please try again later.",
-    headers: true
+    
+    handler: function (req, res) {
+        res.status(400).render('login', { errorMessage: "Too many login attempts. Please try again later." });
+    },
+    headers: true ,
+    
 });
 
 const resetPasswordLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes ,
-    max: 5, // limit each IP to 5 requests per windowMs ,
-    message: "Too many password reset attempts, please try again later.",
+    windowMs: 15 * 60 * 1000, 
+    max: 5, 
+    handler: function (req, res) {
+        res.status(400).render('forget-password', { errorMessage: "Too many password reset requests. Please try again later." });
+    },
     headers: true
 });
 
@@ -36,7 +42,7 @@ function generateResetToken() {
     });
 }
 
-router.get('/login', (req, res) => {
+router.get('/login', loginLimiter,(req, res) => {
     res.render('login') // ./views/login.ejs
 })
 
@@ -88,7 +94,7 @@ router.post('/login', loginLimiter ,  async (req, res) => {
     }
 })
 
-router.post('/register', async (req, res) => {
+router.post('/register',  async (req, res) => {
     const { email, password, firstname, lastname, username } = req.body
 
     const user = await User.findOne({
@@ -112,7 +118,7 @@ router.post('/register', async (req, res) => {
     }
 })
 
-router.get('/forget-password', (req, res) => {
+router.get('/forget-password', resetPasswordLimiter,(req, res) => {
     res.render('forget-password')
 }) ; 
 

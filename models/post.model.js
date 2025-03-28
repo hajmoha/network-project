@@ -1,5 +1,6 @@
 const { DataTypes } = require('sequelize');
 const sequelize = require('../database/connection');
+const User = require('./user.model');
 
 const Post = sequelize.define('Post', {
     id: {
@@ -24,15 +25,32 @@ const Post = sequelize.define('Post', {
         allowNull: false,
         references: {
             model: 'Users',
-            foreignKey: 'id',
+            key: 'id'
         }
+    },
+    createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
+    },
+    updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
     }
 }, {
-    tableName: 'Posts'
+    tableName: 'Posts',
+    defaultScope: {
+        include: [{
+            model: User,
+            as: 'user',
+            attributes: ['username', 'email'] // فیلدهای مورد نیاز را وارد کنید
+        }]
+    }
 });
 
+// تنظیم ارتباط بین Post و User
 Post.associate = (models) => {
-    Post.belongsTo(models.User, {
+    // استفاده از مدل User
+    Post.belongsTo(User, {
         foreignKey: 'user_id',
         as: 'user'
     });

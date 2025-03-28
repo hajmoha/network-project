@@ -9,5 +9,4 @@ const sequelize = new Sequelize('project', 'network', 'network', {
     
 });
 
-
 module.exports = sequelize;

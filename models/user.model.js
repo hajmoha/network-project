@@ -1,23 +1,21 @@
-const {DataTypes } = require('sequelize');
-const sequelize = require('../database/connection')
-const Post = require('./post.model');
+const { DataTypes } = require('sequelize');
+const sequelize = require('../database/connection');
 
 const User = sequelize.define(
     'User',
     {
-      // Model attributes are defined here
-      id : {
-        type : DataTypes.INTEGER,
-        allowNull : false,
-        primaryKey : true,
-        autoIncrement : true
+      id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        primaryKey: true,
+        autoIncrement: true
       },
       username: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true , 
-        require:true ,
-        set(value){
+        unique: true,
+        require: true,
+        set(value) {
             this.setDataValue('username', value ? value.toLowerCase() : '');
         }
       },
@@ -29,20 +27,20 @@ const User = sequelize.define(
         type: DataTypes.STRING,
         allowNull: false
       },
-      created_at : {
-        type : DataTypes.DATE,
-        allowNull : false
+      created_at: {
+        type: DataTypes.DATE,
+        allowNull: false
       },
-      updated_at : {
-        type : DataTypes.DATE,
-        allowNull : false
+      updated_at: {
+        type: DataTypes.DATE,
+        allowNull: false
       },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique:true ,
+        unique: true,
         require: true,
-        set(value){
+        set(value) {
             this.setDataValue('email', value ? value.toLowerCase() : '');
         }
       },
@@ -50,32 +48,38 @@ const User = sequelize.define(
         type: DataTypes.STRING,
         allowNull: false,
       },
-      profile_image : {
-        type : DataTypes.STRING,
-        allowNull : true
-      } , 
-      bio : {
-        type : DataTypes.STRING,
-        allowNull : true
-      }  , 
-      current_password : {
-        type : DataTypes.STRING,
-        allowNull : true
-      } , 
-      role:{
-        type : DataTypes.ENUM , 
-        values : ['user' , 'admin'] , 
-        defaultValue : 'user'
-      } ,
-
-     
+      profile_image: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      bio: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      current_password: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      role: {
+        type: DataTypes.ENUM,
+        values: ['user', 'admin'],
+        defaultValue: 'user'
+      }
     },
     {
         timestamps: true,
         createdAt: 'created_at',
         updatedAt: 'updated_at'
     }
-  );
+);
 
+// Function to setup associations
+User.associate = (models) => {
+    const Post = require('./post.model');
+    User.hasMany(Post, {
+        foreignKey: 'user_id',
+        as: 'posts'
+    });
+};
 
-  module.exports = User ;
+module.exports = User;

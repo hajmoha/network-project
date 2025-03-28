@@ -13,7 +13,7 @@ router.get('/about-admin', async(req , res) => {
 
 router.get('/posts/:id', async(req , res) => {
     const post = await Post.findByPk(req.params.id);
-    res.render('public-post',  { post });
+    res.render('public-post',  { post  });
 });
 
 

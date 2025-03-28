@@ -1,7 +1,3 @@
-<!-- show Hello word be user -->
-
-
-<!-- filepath: /home/kalimoha/Desktop/Desktop/owasp/project-network/master/views/index.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,21 +14,19 @@
             --accent-color: #4a90e2;
             --accent-hover: #357abd;
             --border-dark: rgba(255,255,255,0.1);
+            --muted-text: #888;
         }
-
         body {
             background: var(--dark-bg);     
             color: var(--dark-text);
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
         }
-
         .navbar {
             background: rgba(10, 10, 10, 0.95) !important;
             backdrop-filter: blur(8px);
             border-bottom: 1px solid var(--border-dark);
         }
-
         .nav-link {
             color: var(--dark-text) !important;
             transition: all 0.2s ease;
@@ -40,59 +34,87 @@
             margin: 0 0.25rem;
             border-radius: 6px;
         }
-
         .nav-link:hover {
             background: rgba(74, 144, 226, 0.1);
             color: var(--accent-color) !important;
         }
-
-        .auth-container {
-            background: var(--dark-surface);
-            border-radius: 12px;
-            border: 1px solid var(--border-dark);
-            padding: 2rem;
-            max-width: 400px;
-            margin: 2rem auto;
+        .welcome-section {
+            text-align: center;
+            padding: 4rem 0;
         }
-
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .post-card {
+            background: var(--dark-surface);
+            border: 1px solid var(--border-dark);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .post-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        .post-image {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .post-card:hover .post-image {
+            transform: scale(1.05);
+        }
+        .card-body {
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+        .card-title {
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--accent-color);
+        }
+        .card-text {
+            color: var(--muted-text);
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+        .post-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--muted-text);
+            margin-bottom: 1rem;
+        }
         .btn-primary {
             background: var(--accent-color);
             border: none;
             padding: 0.75rem 1.5rem;
             font-weight: 500;
             transition: all 0.2s ease;
+            width: 100%;
+            margin-top: auto;
         }
-
         .btn-primary:hover {
             background: var(--accent-hover);
             transform: translateY(-2px);
         }
-
-        .welcome-section {
-            text-align: center;
-            padding: 4rem 0;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-
-        .feature-card {
+        .no-posts {
             background: var(--dark-surface);
             border: 1px solid var(--border-dark);
             border-radius: 12px;
-            padding: 1.5rem;
+            padding: 3rem;
             text-align: center;
-            transition: transform 0.2s ease;
         }
-
-        .feature-card:hover {
-            transform: translateY(-5px);
-        }
-
         footer {
             background: var(--dark-surface);
             padding: 1.5rem 0;
@@ -117,6 +139,12 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/auth/register">Register</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about-admin">About Admin</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Contact</a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -125,45 +153,46 @@
     <main class="container">
         <section class="welcome-section">
             <h1>Welcome to Network Project</h1>
-            <p class="lead text-muted"></p>
+            <p class="lead"></p>
         </section>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <br>
-        <div class="features-grid">
-            <div class="feature-card">
-                <h3>Secure Authentication</h3>
-                <p>Protected login and registration system with rate limiting</p>
+
+        <% if (posts && posts.length > 0) { %>
+            <h3 class="mt-5 mb-4 text-center">Latest Posts</h3>
+            <div class="posts-grid">
+                <% posts.forEach(post => { %>
+                    <div class="post-card">
+                        <% if (post.cover) { %>
+                            <img src="<%= post.cover %>" class="post-image" alt="<%= post.title %>">
+                        <% } else { %>
+                            <img src="/uploads/17431078614511291095.jpg" class="post-image" alt="Placeholder">
+                        <% } %>
+                        <div class="card-body">
+                            <div class="post-meta">
+                                <span><%= post.user.username || 'Anonymous' %></span>
+                                <span><%= post.createdAt ? new Date(post.createdAt).toLocaleDateString() : 'Unknown date' %></span>
+                            </div>
+                            <h5 class="card-title"><%= post.title %></h5>
+                            <p class="card-text"><%= post.content.substring(0, 150) %>...</p>
+                            <a href="/posts/<%= post.id %>" class="btn btn-primary">Read More</a>
+                        </div>
+                    </div>
+                <% }); %>
             </div>
-            <div class="feature-card">
-                <h3>User Profiles</h3>
-                <p>Customize your profile with images and personal information</p>
+        <% } else { %>
+            <div class="no-posts">
+                <h4>No posts have been published yet</h4>
+                <p>Be the first to create a post and start sharing your stories!</p>
+                <a href="/posts/create" class="btn btn-primary mt-3">Create First Post</a>
             </div>
-            <div class="feature-card">
-                <h3>Password Recovery</h3>
-                <p>Secure password reset functionality when needed</p>
-            </div>
-        </div>
+        <% } %>
     </main>
 
     <footer>
         <div class="container">
-            <p class="mb-0">&copy; 2025 Network Project. created by @moha_st.</p>
+            <p class="mb-0">&copy; 2025 Network Project. Created by @moha_st.</p>
         </div>
     </footer>
-
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

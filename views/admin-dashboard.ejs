@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar {
+            background-color: #f8f9fa;
+            box-shadow: 0 2px 4px rgba(0,0,0,.1);
+        }
+        .table th {
+            background-color: #f8f9fa;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container">
+            <a class="navbar-brand" href="/">Admin Panel</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" id="posts-link" href="#">Posts</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="users-link" href="#">Users</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/logout">LogOut</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div id="posts-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Posts Management</h2>
+                
+            </div>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Created At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="posts-table-body"></tbody>
+            </table>
+        </div>
+
+        <div id="users-section" style="display:none;">
+            <h2 class="mb-4">Users Management</h2>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Username</th>
+                        <th>Role</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="users-table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script>
+        function deleteAction(ID, action) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                $.ajax({
+                    url: `/admin/${action}/${ID}`,
+                    type: 'DELETE',
+                    processData: false,
+                    contentType: false,
+                    success: function(data) {
+                        $("#" + ID).remove();
+                        alert('Item deleted successfully!');
+                    },
+                    error: function(error) {
+                        console.error("Error occurred during deletion:", error);
+                        alert('Error deleting item');
+                    }
+                });
+            }
+        }
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            function formatDate(dateString) {
+                return new Date(dateString).toLocaleDateString();
+            }
+
+            function loadPosts() {
+                fetch('/admin/posts')
+                    .then(response => response.json())
+                    .then(posts => {
+                        const postsTableBody = document.getElementById("posts-table-body");
+                        postsTableBody.innerHTML = '';
+                        posts.forEach(post => {
+                            postsTableBody.innerHTML += `
+                                <tr id="${post.id}">
+                                    <td>${post.id}</td>
+                                    <td>${post.title}</td>
+                                    <td>${post.user ? post.user.username : 'Unknown'}</td>
+                                    <td>${formatDate(post.createdAt)}</td>
+                                    <td class="action-buttons">
+                                        <a href="/admin/posts/${post.id}" class="btn btn-sm btn-primary">Edit</a>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteAction(${post.id}, 'posts')">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading posts:', error);
+                        alert('Error loading posts');
+                    });
+            }
+
+            function loadUsers() {
+                fetch('/admin/users')
+                    .then(response => response.json())
+                    .then(users => {
+                        const usersTableBody = document.getElementById("users-table-body");
+                        usersTableBody.innerHTML = '';
+                        users.forEach(user => {
+                            usersTableBody.innerHTML += `
+                                <tr id="${user.id}">
+                                    <td>${user.id}</td>
+                                    <td>${user.email}</td>
+                                    <td>${user.username || 'N/A'}</td>
+                                    <td>${user.role}</td>
+                                    <td class="action-buttons">
+                                        <a href="/admin/users/${user.id}" class="btn btn-sm btn-primary">Edit</a>
+                                        <button class="btn btn-sm btn-danger" onclick="deleteAction(${user.id}, 'users')">Delete</button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error loading users:', error);
+                        alert('Error loading users');
+                    });
+            }
+
+            // Initial load
+            loadPosts();
+
+            // Tab switching
+            const postsLink = document.getElementById("posts-link");
+            const usersLink = document.getElementById("users-link");
+            const postsSection = document.getElementById("posts-section");
+            const usersSection = document.getElementById("users-section");
+
+            if (postsLink && usersLink && postsSection && usersSection) {
+                postsLink.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    loadPosts();
+                    postsSection.style.display = 'block';
+                    usersSection.style.display = 'none';
+                    postsLink.parentElement.classList.add('active');
+                    usersLink.parentElement.classList.remove('active');
+                });
+
+                usersLink.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    loadUsers();
+                    usersSection.style.display = 'block';
+                    postsSection.style.display = 'none';
+                    usersLink.parentElement.classList.add('active');
+                    postsLink.parentElement.classList.remove('active');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
