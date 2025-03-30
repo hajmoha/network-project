@@ -18,6 +18,8 @@ const app = express();
 // Middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'static')));
+app.use('/uploads', express.static(path.join(__dirname, 'static/uploads')));
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');

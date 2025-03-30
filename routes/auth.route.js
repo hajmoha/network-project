@@ -7,6 +7,7 @@ const crypto = require('crypto');
 
 // reteLimit is a middleware to limit the number of requests from an IP address
 const rateLimit = require('express-rate-limit');
+const { token } = require('morgan');
 
 
 const loginLimiter = rateLimit({
@@ -137,59 +138,73 @@ router.post('/forget-password', resetPasswordLimiter ,async (req, res) => {
             token: await generateResetToken(),
             expiresAt: new Date(Date.now() + 3600000) 
         };
+        console.log(resetToken);
+        
 
         await ResetPassword.create({
             email,
             token: resetToken.token,
             expiresAt: resetToken.expiresAt
         })
+        console.log('url: ', `${req.protocol}://${req.get('host')}/auth/forget-password/${resetToken.token}`);
         
         res.redirect('/auth/login')
     } else {
         res.redirect('/auth/login')
     }
+
 })
 
-
-router.post('/forget-password/:token', async (req, res) => {
+router.get('/forget-password/:token', async (req, res) => {
     const { token } = req.params;
-    const { password } = req.body;
-
-    try {
+    try{
         const resetPassword = await ResetPassword.findOne({
             where: { token }
         });
+        if (!resetPassword && resetPassword.expiresAt < new Date()) {
+            return res.status(400).send("Invalid or expired token");
+        }
+        else{
+            res.render('reset-password', { token });
+        }
+        
+    } catch (error) {
+        return res.status(500).send("Internal server error");
+    }
+});
 
-        if (!resetPassword) {
+router.post('/forget-password/:token', async (req, res) => {
+    const { token } = req.params;
+    const { password, confirmPassword } = req.body;
+
+    if (password !== confirmPassword) {
+        return res.render('reset-password', { token, errorMessage: "Passwords do not match!" });
+    }
+
+    try {
+      
+        const resetPasswordRecord = await ResetPassword.findOne({ where: { token } });
+        if (!resetPasswordRecord || resetPasswordRecord.expiresAt < new Date()) {
             return res.status(400).send("Invalid or expired token");
         }
 
-        // Check if the token has expired
-        if (resetPassword.expiresAt < new Date()) {
-            return res.status(400).send("Token has expired");
-        }
-
-        const user = await User.findOne({
-            where: { email: resetPassword.email }
-        });
-
+        
+        const user = await User.findOne({ where: { email: resetPasswordRecord.email } });
         if (!user) {
             return res.status(404).send("User not found");
         }
-        else{
-            // change the password
-            user.password = password;
-            await user.save();
-            // delete the reset password record
-            await resetPassword.destroy();
-            res.status(200).send("Password updated successfully");
-        }
 
+        user.password = password; 
+        await user.save();
+        // delete the reset password record
+        await ResetPassword.destroy({ where: { token } });
+
+        res.redirect('/auth/login');
     } catch (error) {
+        console.error(error);
         res.status(500).send("Internal server error");
     }
-
-})
+});
 
 router.get('/logout', (req, res) => {
     res.clearCookie('token');
