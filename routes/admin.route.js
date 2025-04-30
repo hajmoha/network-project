@@ -6,6 +6,7 @@ const { authMiddleware, isAdmin } = require('../middleware/auth.middleware');
 const multer = require('multer');
 const cookieParser = require('cookie-parser');
 const path = require('path');
+const auth = require('../middleware/auth.middleware');
 
 // Set storage engine
 const storage = multer.diskStorage({
@@ -22,11 +23,11 @@ const upload = multer({ storage: storage });
 User.hasMany(Post, { foreignKey: 'user_id', as: 'posts' });
 Post.belongsTo(User, { foreignKey: 'user_id', as: 'user' });
 
-router.get('/', async (req, res) => {
+router.get('/', isAdmin , authMiddleware , async (req, res) => {
     res.render('admin-dashboard');
 });
 
-router.get('/users', async (req, res) => {
+router.get('/users', isAdmin , authMiddleware ,async (req, res) => {
     try {
         const users = await User.findAll();
         res.json(users);
@@ -37,7 +38,7 @@ router.get('/users', async (req, res) => {
     }
 });
 
-router.get('/users/:id', async(req, res) => {
+router.get('/users/:id', isAdmin , authMiddleware , async(req, res) => {
     try {
         const { id } = req.params;
         const user = await User.findByPk(id);
@@ -53,7 +54,7 @@ router.get('/users/:id', async(req, res) => {
     }
 });
 
-router.post('/users/:id', async(req, res) => {
+router.post('/users/:id', isAdmin , authMiddleware ,async(req, res) => {
     try {
         const { id } = req.params;
         const { firstName, lastName, email, role } = req.body;
@@ -77,7 +78,7 @@ router.post('/users/:id', async(req, res) => {
     }
 });
 
-router.delete('/users/:id', async (req, res) => {
+router.delete('/users/:id', isAdmin , authMiddleware ,async (req, res) => {
     try {
         const {id} = req.params;
         const user = await User.findByPk(id);
@@ -90,7 +91,7 @@ router.delete('/users/:id', async (req, res) => {
     }
 });
 
-router.get('/posts', async (req, res) => {
+router.get('/posts',isAdmin , authMiddleware , async (req, res) => {
     try {
         const posts = await Post.findAll({
             include: [{
@@ -108,7 +109,7 @@ router.get('/posts', async (req, res) => {
 
 
 
-router.get('/posts/:id', async (req, res) => {
+router.get('/posts/:id',isAdmin , authMiddleware , async (req, res) => {
     try {
         const post = await Post.findByPk(req.params.id);
         if (!post) {
@@ -117,11 +118,12 @@ router.get('/posts/:id', async (req, res) => {
         res.render('update-post-admin', { post });
     } catch (error) {
         console.error('Error:', error);
+        // In deful , we can send a 500 error
         res.redirect('/admin');
     }
 });
 
-router.post('/posts/:id', upload.single('cover'), async (req, res) => {
+router.post('/posts/:id',isAdmin , authMiddleware , upload.single('cover'), async (req, res) => {
     try {
         const { id } = req.params;
         const { title, content } = req.body;
@@ -144,7 +146,7 @@ router.post('/posts/:id', upload.single('cover'), async (req, res) => {
     }
 });
 
-router.delete('/posts/:id', async (req, res) => {
+router.delete('/posts/:id',isAdmin , authMiddleware , async (req, res) => {
     try {
         const {id} = req.params;
         const post = await Post.findByPk(id);
@@ -157,7 +159,7 @@ router.delete('/posts/:id', async (req, res) => {
     }
 });
 
-router.get('/logout', (req, res) => {   
+router.get('/logout',isAdmin , authMiddleware , (req, res) => {   
     res.clearCookie('token');
     res.redirect('/');
 });

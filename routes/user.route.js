@@ -19,7 +19,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 // Profile GET route
-router.get('/profile', async (req, res) => {
+router.get('/profile', authMiddleware,async (req, res) => {
     try {
         const user = await User.findOne({
             where: {
@@ -48,7 +48,7 @@ router.get('/profile', async (req, res) => {
 });
 
 // Profile POST route with comprehensive error handling
-router.post('/profile', upload.single('image'), async (req, res) => {
+router.post('/profile',authMiddleware, upload.single('image'), async (req, res) => {
     try {
         const { firstName, lastName, bio } = req.body;
         const { current_password, new_password, confirm_new_password } = req.body;
@@ -116,7 +116,7 @@ router.post('/profile', upload.single('image'), async (req, res) => {
 });
 
 // Posts Create GET route
-router.get('/posts/create', async (req, res) => {
+router.get('/posts/create', authMiddleware,async (req, res) => {
     try {
         const user = await User.findOne({
             where: { email: req.user.email }
@@ -141,7 +141,7 @@ const postStorage = multer.diskStorage({
 const uploadPost = multer({ storage: postStorage });
 
 // Posts Create POST route
-router.post('/posts/create', uploadPost.single('cover'), async (req, res) => {
+router.post('/posts/create',authMiddleware, uploadPost.single('cover'), async (req, res) => {
     try {
         const user = await User.findOne({
             where: { email:req.user.email }
@@ -168,7 +168,7 @@ router.post('/posts/create', uploadPost.single('cover'), async (req, res) => {
 });
 
 // Post Update GET route
-router.get('/posts/:id', async (req, res) => {
+router.get('/posts/:id', authMiddleware,async (req, res) => {
     try {
         const user = await User.findOne({
             where: { email: req.user.email }
@@ -192,7 +192,7 @@ router.get('/posts/:id', async (req, res) => {
     }
 });
 
-router.get('/posts/:id', async (req, res) => {
+router.get('/posts/:id',authMiddleware, async (req, res) => {
     try {
         const user = await User.findOne({
             where: { email: req.user.email }
@@ -217,7 +217,7 @@ router.get('/posts/:id', async (req, res) => {
 });
 
 // Post Update POST route
-router.post('/posts/:id', uploadPost.single('cover'), async (req, res) => {
+router.post('/posts/:id',authMiddleware, uploadPost.single('cover'), async (req, res) => {
     try {
         const { id } = req.params;
         const { title, content } = req.body;
@@ -252,7 +252,7 @@ router.post('/posts/:id', uploadPost.single('cover'), async (req, res) => {
 });
 
 // Post Delete route
-router.delete('/posts/:id', async (req, res) => {
+router.delete('/posts/:id', authMiddleware,async (req, res) => {
     try {
         const postId = req.params.id;
         if (!postId) {
